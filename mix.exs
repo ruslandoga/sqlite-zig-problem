@@ -14,15 +14,14 @@ defmodule E.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
-      mod: {E.Application, []}
+      extra_applications: [:logger]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ecto_sqlite3, "~> 0.7.5"}
+      {:exqlite, "~> 0.11.2"}
     ]
   end
 end

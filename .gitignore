@@ -28,3 +28,7 @@ e-*.tar
 .elixir_ls
 .envrc
 .DS_Store
+*.dylib
+dist/
+zig-cache/
+.vscode
