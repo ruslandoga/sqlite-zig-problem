@@ -6,29 +6,10 @@ var sqlite3: *c.sqlite3_api_routines = undefined;
 const TotalError = error{NoTotal};
 
 fn getTotal(ctx: ?*c.sqlite3_context) TotalError!*c_longlong {
-    const totalCtx = sqlite3.aggregate_context.?(ctx, @sizeOf(c_longlong));
-    std.debug.print("ctx={}\n", .{totalCtx});
-    // std.debug.print("TypeOf={}, isAligned4={}, isAligned8={}, totalCtx={}\n", .{
-    //     @TypeOf(totalCtx),
-    //     std.mem.isAligned(@ptrToInt(totalCtx.?), 4),
-    //     std.mem.isAligned(@ptrToInt(totalCtx.?), 8),
-    //     totalCtx,
-    // });
-
-    // const p = @ptrCast([*]u8, totalCtx.?);
-    // std.debug.print("deref: {} ", .{@ptrCast(*u8, p).*});
-    // std.debug.print("{} ", .{@ptrCast(*u8, p + 1).*});
-    // std.debug.print("{} ", .{@ptrCast(*u8, p + 2).*});
-    // std.debug.print("{} ", .{@ptrCast(*u8, p + 3).*});
-    // std.debug.print("{} ", .{@ptrCast(*u8, p + 4).*});
-    // std.debug.print("{} ", .{@ptrCast(*u8, p + 5).*});
-    // std.debug.print("{} ", .{@ptrCast(*u8, p + 6).*});
-    // std.debug.print("{}\n", .{@ptrCast(*u8, p + 7).*});
-
-    const totalCtxAligned = @alignCast(@alignOf(c_longlong), totalCtx);
-    // std.debug.print("{}, {}\n", .{ @TypeOf(totalCtxAligned), totalCtxAligned });
-
-    const total = @ptrCast(?*c_longlong, totalCtxAligned);
+    const size = @sizeOf(c_longlong);
+    const alignment = @alignOf(c_longlong);
+    const unaligned_ptr = sqlite3.aggregate_context.?(ctx, size + alignment);
+    const total = @intToPtr(?*c_longlong, std.mem.alignForward(@ptrToInt(unaligned_ptr), alignment));
 
     if (total == null) {
         sqlite3.result_error_nomem.?(ctx);
